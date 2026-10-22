@@ -88,28 +88,15 @@ Worth knowing before you start:
 
 ## Game data
 
-OutRun's ROM data is copyright SEGA and is not distributed with this project. You have to supply it yourself, from a set you legally own. Required is the MAME **`outrun` revision B parent set**: 31 files, roughly 2.2 MB, extracted — zip archives are not read. [tools/README.md](tools/README.md) lists every file and what it contains.
+OutRun's ROM data is copyright SEGA and is not distributed with this project. You have to supply it yourself, from a set you legally own. Required is the MAME **`outrun` revision B parent set**: 31 files, roughly 2.2 MB. [tools/README.md](tools/README.md) lists every file and what it contains.
 
-The tile, sprite and road ROMs are stored in a packed arcade-specific layout and have to be decoded before they can be drawn. Cannonball does that at startup into approximately 1.5 MB of RAM, which an RP2350 does not have, so pico-outrun does it ahead of time and stores the result as a single data image. There are two ways to provide that image, and the application tries them in this order.
+The tile, sprite and road ROMs are stored in a packed arcade-specific layout and have to be decoded before they can be drawn. Cannonball does that at startup into approximately 1.5 MB of RAM, which an RP2350 does not have, so pico-outrun stores the decoded result as a single data image. There are two ways to provide that image.
 
-**1. Flashed (recommended).** [tools/mkoutrundata.sh](tools/mkoutrundata.sh) converts a ROM set into `outrun-data.uf2`, a data image that is flashed once, to a fixed address just after the application, and read directly from flash while the game runs. This is the fastest route: the game starts immediately, and no SD card is needed to play.
+### 1. ROM set on the SD card, installed with updateAll (recommended)
 
-```sh
-./bld.sh -m -c 8 -2                    # once, to establish the flash address
-tools/mkoutrundata.sh ~/roms/outrun    # writes outrun-data.uf2
-```
+The ROM set is placed in `/roms/ORUN` on the SD card, and the application builds the data image from it in PSRAM at startup, showing a progress bar while it does. This takes a few seconds on every boot and needs roughly 2.7 MB of free PSRAM, but requires nothing on the computer other than `updateAll`.
 
-The first command only configures the build, to establish the flash address the data image is written to; it needs the Pico SDK, see [Building from source](#building-from-source). The address is the same for all five supported configurations, so one data image works with every released binary.
-
-Flash `outrun-data.uf2` the same way as the application, over BOOTSEL or with `picotool`. It only has to be flashed again when it changes, so reflashing the application later leaves the game data in place.
-
-**2. From the SD card.** If no data image has been flashed, the application looks for the ROM set itself in `/roms/ORUN` on the SD card and builds the same image in PSRAM at startup, showing a progress bar while it does. This requires no host tools at all — the ROM files are copied across unchanged — but it takes a few seconds on every boot and needs roughly 2.7 MB of free PSRAM. `/roms/ORUN/outrun` is searched as well, since extracting a MAME set commonly produces that layout.
-
-Each file is checked against its expected CRC on both routes, so an incomplete set, a corrupt file or a different revision is reported by name rather than producing a subtly incorrect image.
-
-If neither route has been taken, the application displays a screen describing what is missing and what to do about it — no PSRAM, no SD card, no ROMs in the directory it looked in, files missing from the set, or a CRC mismatch. The settings menu remains reachable with **Select + Start** from that screen, so [USB drive mode](#usb-drive-mode) can be used to put the ROM set on the card, and BOOTSEL mode can be entered without unplugging the board.
-
-**updateAll installs the set on the SD card.** `updateAll.exe`, a program for Windows 10 and 11, is included in every release of pico-outrun from v0.5.1 on, among the files at the end of the release page. It runs on a computer with the SD card inserted: it takes `outrun.zip` from a folder of your choice, or downloads it when it is not there, and writes the set, unzipped and under the file names the application expects, into `/roms/ORUN`. This prepares the card for the second route above; the data image of the first route is still made with `tools/mkoutrundata.sh`. It is a single file and needs no installation. The program is not signed, so Windows may show "Windows protected your PC" the first time it is started; select **More info**, then **Run anyway**.
+`updateAll.exe`, a program for Windows 10 and 11, is included in every release of pico-outrun from v0.5.1 on, among the files at the end of the release page. It runs on a computer with the SD card inserted: it takes `outrun.zip` from a folder of your choice, or downloads it when it is not there, and writes the set, unzipped and under the file names the application expects, into `/roms/ORUN`. It is a single file and needs no installation. The program is not signed, so Windows may show "Windows protected your PC" the first time it is started; select **More info**, then **Run anyway**.
 
 1. Start `updateAll.exe`. It selects a removable drive by itself; under **SD card**, check that it is the card, or choose another.
 2. Under **Zip folder**, choose the folder with the MAME zips you already have, if any.
@@ -119,6 +106,27 @@ If neither route has been taken, the application displays a screen describing wh
 By default, zips that are not in the zip folder are downloaded from [ArcadeROMsDB_MiSTer](https://github.com/zakk4223/ArcadeROMsDB_MiSTer), a third-party database that is not part of this project. The user is responsible for holding the rights to the ROM sets, whether they are supplied as zips or downloaded. To use only your own zips, untick **Download missing files**.
 
 updateAll is maintained in [pico-bootLoader](https://github.com/PicoPlus-devel/pico-bootLoader), whose SD-card archive carries it as well. The same installer is also available there as a Python script, `updateAll.py`, for Linux and macOS, and as a PowerShell script, `updateAll.ps1`. The [updateAll README](https://github.com/PicoPlus-devel/pico-bootLoader/blob/main/updateAll/README.md) describes all three and their options.
+
+The files can also be copied to the card by hand. They must be extracted, since zip archives are not read, and carry the file names listed in [tools/README.md](tools/README.md). `/roms/ORUN/outrun` is searched as well, since extracting a MAME set commonly produces that layout.
+
+### 2. Data image in flash
+
+[tools/mkoutrundata.sh](tools/mkoutrundata.sh) converts a ROM set into `outrun-data.uf2`, a data image that is flashed once, to a fixed address just after the application, and read directly from flash while the game runs. The game then starts immediately and no SD card is needed to play, but making the image requires the Pico SDK.
+
+```sh
+./bld.sh -m -c 8 -2                    # once, to establish the flash address
+tools/mkoutrundata.sh ~/roms/outrun    # writes outrun-data.uf2
+```
+
+The first command only configures the build, to establish the flash address the data image is written to; see [Building from source](#building-from-source). The address is the same for all five supported configurations, so one data image works with every released binary.
+
+Flash `outrun-data.uf2` the same way as the application, over BOOTSEL or with `picotool`. It only has to be flashed again when it changes, so reflashing the application later leaves the game data in place. When a data image is present in flash, the application uses it and does not look for the ROM set on the SD card.
+
+### Checks and error reporting
+
+Each file is checked against its expected CRC with both methods, so an incomplete set, a corrupt file or a different revision is reported by name rather than producing a subtly incorrect image.
+
+If the game data is found neither in flash nor on the SD card, the application displays a screen describing what is missing and what to do about it — no PSRAM, no SD card, no ROMs in the directory it looked in, files missing from the set, or a CRC mismatch. The settings menu remains reachable with **Select + Start** from that screen, so [USB drive mode](#usb-drive-mode) can be used to put the ROM set on the card, and BOOTSEL mode can be entered without unplugging the board.
 
 ***
 
@@ -228,11 +236,11 @@ For the full photo gallery and assembly detail, see the [PCB section of the pico
 
 ## SD card setup
 
-An SD card is optional. With the game data flashed, the game runs without one, and a missing card is not an error.
+With the recommended method, the SD card holds the ROM set. Only when the game data has been flashed can the game run without a card; a missing card is then not an error.
 
 A card is used for two things:
 
-1. **The ROM set**, if you would rather not build the data image on a PC. Format the card as FAT32 (recommended) or exFAT and copy the extracted OutRun ROM files into `/roms/ORUN`, or have `updateAll.exe` write them there from a Windows computer. The folder is created automatically on first boot. See [Game data](#game-data).
+1. **The ROM set.** Format the card as FAT32 (recommended) or exFAT and install the set into `/roms/ORUN` with `updateAll`, or copy the extracted OutRun ROM files there by hand. The folder is created automatically on first boot. See [Game data](#game-data).
 2. **Settings.** Screen mode, audio output and the other options from the settings menu are stored in `/settings_ARC.dat` in the root of the card and are remembered across restarts. The file is shared by all arcade games of this family. Without a card the settings revert to their defaults on every boot.
 
 There are no save files: the game has no save states, and high scores are not written to the card.
