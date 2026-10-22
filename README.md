@@ -27,6 +27,17 @@ All five are RP2350 boards with 8 MB of PSRAM, which this port requires: a plain
 
 ***
 
+## Getting started
+
+1. **Flash the game.** Download the `.uf2` for your board from the [Releases](https://github.com/PicoPlus-devel/pico-outrun/releases) page; the table under [Supported hardware](#supported-hardware) gives the file name for each board. Hold BOOTSEL, connect the board over USB, and copy the `.uf2` onto the `RP2350` drive that appears.
+2. **Prepare the SD card.** Format a microSD card as FAT32 (recommended) or exFAT.
+3. **Run `updateAll`.** Download `updateAll.exe` from the same Releases page and start it on a Windows 10 or 11 computer with the card inserted. Check under **SD card** that the card is selected, untick the sets that are not wanted — pico-outrun needs only **OutRun** — and select **Install**. `updateAll` takes `outrun.zip` from the folder chosen under **Zip folder**, or downloads it when it is not there, and writes the ROM set into `/roms/ORUN` under the file names the application expects. Windows may report that the program is not signed: select **More info**, then **Run anyway**. On Linux or macOS, use the Python version from [pico-bootLoader](https://github.com/PicoPlus-devel/pico-bootLoader/tree/main/updateAll) instead: `python3 updateAll.py --core outrun --sd <path of the card>`. The ROM set is not part of this project, and holding the rights to it is the user's responsibility; [Game data](#game-data) describes how to use only a zip you already have, or how to copy the files by hand.
+4. **Run it.** Insert the card and power on the board. The application builds the game data from the ROM set in PSRAM, which takes a few seconds and shows a progress bar, and then starts the game in attract mode. Press **Start** to play.
+
+The SD card route above needs no tools besides `updateAll`, but repeats the data build on every boot. For a game that starts immediately and runs without an SD card, flash the game data image instead; making it requires the Pico SDK. See [Game data](#game-data).
+
+***
+
 ## Screenshots
 
 The game as the port draws it, at twice the original 320x224 resolution. On the board the picture is centred in the 320x240 display, with eight blank lines above and below it. The pictures were captured with the [host-side test harness](#host-side-test-harness), which runs the same engine and game data as the firmware.
@@ -105,7 +116,7 @@ If neither route has been taken, the application displays a screen describing wh
 3. Untick the sets that are not wanted. updateAll also installs the sets of other applications of this family, such as pico-galagino and pico-phoenix; pico-outrun needs only the set **OutRun**. The **Status** column shows which sets are already complete on the card.
 4. Select **Install**.
 
-By default, zips that are not in the zip folder are downloaded from [ArcadeROMsDB_MiSTer](https://github.com/zakk4223/ArcadeROMsDB_MiSTer), a third-party database that is not part of this project. The user is responsible for holding the rights to the ROM sets, whether they are supplied as zips or downloaded. To use only your own zips, untick **Download missing zips**.
+By default, zips that are not in the zip folder are downloaded from [ArcadeROMsDB_MiSTer](https://github.com/zakk4223/ArcadeROMsDB_MiSTer), a third-party database that is not part of this project. The user is responsible for holding the rights to the ROM sets, whether they are supplied as zips or downloaded. To use only your own zips, untick **Download missing files**.
 
 updateAll is maintained in [pico-bootLoader](https://github.com/PicoPlus-devel/pico-bootLoader), whose SD-card archive carries it as well. The same installer is also available there as a Python script, `updateAll.py`, for Linux and macOS, and as a PowerShell script, `updateAll.ps1`. The [updateAll README](https://github.com/PicoPlus-devel/pico-bootLoader/blob/main/updateAll/README.md) describes all three and their options.
 
