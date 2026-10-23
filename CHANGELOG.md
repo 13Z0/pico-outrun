@@ -5,6 +5,11 @@ Cannonball engine
 
 # Changelog
 
+## v0.5.2
+
+- **PicoNES PCB Gerber files.** The release now includes the Gerber files of the PicoNES PCB: `pico_nesPCB_v2.6.zip` with NES controller ports, and the new `pico_nesPCB_v2.8_SNES_PORTS.zip` with SNES controller ports, designed by John Edgar Park ([@johnedgarpark](https://twitter.com/johnedgarpark)). Both need a Pimoroni Pico Plus 2 mounted on male headers. See [Custom PCB](https://github.com/PicoPlus-devel/pico-outrun#custom-pcb) in the readme, and the [PCB README](https://github.com/PicoPlus-devel/pico_shared/blob/main/PCB/README.md) for parts lists and build instructions.
+- The binaries are the same as in v0.5.1.
+
 ## v0.5.1
 
 - The release now includes updateAll.exe, which installs the ROM set on the SD card from a Windows computer. The readme explains how to use it.
@@ -53,7 +58,7 @@ is on screen.
 | Board | File |
 | --- | --- |
 | Adafruit Fruit Jam | `picoOutRun_AdafruitFruitJam_arm_piousb.uf2` |
-| Pimoroni Pico Plus 2 with Adafruit DVI and microSD breakouts, or on the PicoNES PCB (v2.6 or later) | `picoOutRun_AdafruitDVISD_pico2_arm.uf2` |
+| Pimoroni Pico Plus 2 with Adafruit DVI and microSD breakouts, or on the PicoNES PCB (v2.6 or v2.8) | `picoOutRun_AdafruitDVISD_pico2_arm.uf2` |
 | Murmulator M2 | `picoOutRun_MurmulatorM2_arm.uf2` |
 | Adafruit Feather RP2350 with HSTX port and TLV320DAC3100 | `picoOutRun_AdafruitFeatherRP2350_TLV320DAC3100_arm_piousb.uf2` |
 | Olimex RP2040-PICO-PC with a Pico 2 compatible board that has 8 MB of PSRAM | `picoOutRun_OlimexPicoPC_arm.uf2` |

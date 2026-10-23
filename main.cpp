@@ -59,10 +59,10 @@
 #define OUTRUN_MAX_VOLTAGE VREG_VOLTAGE_1_30
 #else
 /* 378 MHz / 1.50 V on every HSTX board. The limits allow 504 MHz / 1.70 V, as in
- * pico_snesPlus, but that opt-in is not reachable here: pico_shared offers
- * Overclock only in the ROM browser's settings menu, never in-game (menu.cpp
- * skips MOPT_OVERCLOCK when calledFromGame), and this port only has the in-game
- * menu. See MOPT_OVERCLOCK below.
+ * pico_snesPlus, but that opt-in is not offered here. This port only has the
+ * in-game menu, and pico_shared shows Overclock there only when its visibility
+ * is 2 (menu.cpp skips MOPT_OVERCLOCK when calledFromGame and the visibility is
+ * below 2). MOPT_OVERCLOCK is 0 below, so the entry stays hidden.
  *
  * Should it ever be exposed: 504 MHz needs 1.70 V - snesPlus records that
  * 1.60-1.65 V hardfaults in heavy scenes - and its comment warns that 1.7 V
@@ -132,7 +132,7 @@ int8_t g_settings_visibility_outrun[MOPT_COUNT] = {
     [MOPT_AUTO_INSERT_FDS_DISK_A] = 0,  // Famicom Disk System
     [MOPT_AUTO_SWAP_FDS_DISK] = 0,      // Famicom Disk System
     [MOPT_FDS_DISK_SWAP] = 0,           // Famicom Disk System
-    [MOPT_OVERCLOCK] =  0,              // never offered in-game anyway; see the clock notes above
+    [MOPT_OVERCLOCK] =  0,              // 2 would offer it in-game; kept off, see the clock notes above
     [MOPT_FM_AUDIO] = 0,                // Master System YM2413
     [MOPT_ENTER_BOOTSEL_MODE] = 1,
     [MOPT_CONTROLLER_TEST] = 1,

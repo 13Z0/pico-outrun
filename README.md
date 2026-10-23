@@ -144,7 +144,7 @@ An RP2350 board with 8 MB of PSRAM is required, and video must run over HSTX. On
 
 Notes per configuration:
 
-- **HW_CONFIG 2**: a plain Raspberry Pi Pico 2 does not work — it has no PSRAM. The Pimoroni Pico Plus 2 (with onboard PSRAM) is required. The [PicoNES PCB](#picones-pcb) is the tidy version of this configuration; it needs design v2.6 or later, which is the first that can host a Pimoroni Pico Plus 2. The two builds take different microSD breakouts: on a breadboard the [Adafruit Micro-SD breakout board+](https://www.adafruit.com/product/254), on the PCB the smaller [Adafruit Micro SD SPI or SDIO breakout](https://www.adafruit.com/product/4682), which is the footprint the board is laid out for.
+- **HW_CONFIG 2**: a plain Raspberry Pi Pico 2 does not work — it has no PSRAM. The Pimoroni Pico Plus 2 (with onboard PSRAM) is required. The [PicoNES PCB](#picones-pcb) is the tidy version of this configuration; it needs design v2.6 or v2.8, the designs that can host a Pimoroni Pico Plus 2. The two builds take different microSD breakouts: on a breadboard the [Adafruit Micro-SD breakout board+](https://www.adafruit.com/product/254), on the PCB the smaller [Adafruit Micro SD SPI or SDIO breakout](https://www.adafruit.com/product/4682), which is the footprint the board is laid out for.
 - **HW_CONFIG 8**: no additional hardware is required apart from a USB game controller. Button 2 switches the NeoPixel VU meter on and off.
 - **HW_CONFIG 14**: the Feather RP2350 is sold in two variants: [with 8 MB PSRAM onboard](https://www.adafruit.com/product/6130) and [without PSRAM](https://www.adafruit.com/product/6000). On the variant without PSRAM, a PSRAM chip must be soldered onto the board separately.
 - **HW_CONFIG 15**: a standard Raspberry Pi Pico 2 does not work — it has no PSRAM. The board fitted must have 8 MB of PSRAM with its chip select on GPIO 8. A NES or SNES controller can be connected to the UEXT connector: clock on GPIO 5, latch on GPIO 9 and data on GPIO 20. There is only one controller port and no Wii Classic controller support. There is no Pico 2 W binary. Support for this board was contributed by [DnCraptor](https://github.com/DnCraptor).
@@ -159,7 +159,7 @@ For wiring and assembly instructions, see the setup sections of the [pico-infone
 
 ## Overclocking
 
-All five supported configurations run at **378 MHz at 1.50 V**. Cannonball runs single-core: core1 is owned by the display driver and the sound chain, so all of the engine and rendering headroom has to come out of the core clock. 378 MHz is what makes the port viable at all, and there is no user-selectable overclock — the settings menu entry that the sister projects offer is a ROM-browser feature, and this port has no ROM browser.
+All five supported configurations run at **378 MHz at 1.50 V**. Cannonball runs single-core: core1 is owned by the display driver and the sound chain, so all of the engine and rendering headroom has to come out of the core clock. 378 MHz is what makes the port viable at all, and there is no user-selectable overclock. The sister projects offer it in the settings menu of their ROM browser; this port has no ROM browser, and the entry is not enabled in its in-game menu.
 
 That clock is also why the board configurations driven by the bit-banged PicoDVI driver are not supported. There the system clock is tied to the pixel clock and cannot exceed 324 MHz, and without the HSTX driver's background task the sound chain moves back onto core0, so audio quality follows the frame rate. `./bld.sh -D` still forces that path on an HSTX-capable board, and the remaining board configurations in `pico_shared` still build, but neither is a supported way to run this port. Most of those boards have no PSRAM either.
 
@@ -169,68 +169,48 @@ Use this software at your own risk. I am not responsible in any way for damage t
 
 ## Custom PCB
 
-A community PCB design turns the HW_CONFIG 2 breadboard build into a finished little console: it carries a Pico-format board, the DVI and microSD breakouts and a controller port on a single board, with an optional 3D-printed case. Nothing changes in the firmware — it is simply a neater way to build hardware this port already supports, so you flash the same HW_CONFIG 2 binary and you are done.
+The PicoNES PCB turns the HW_CONFIG 2 breadboard build into a small console. It carries the microcontroller board, the DVI and microSD breakouts and two controller ports. It comes in two versions, which differ only in the controller ports: **v2.6** with NES controller ports and **v2.8** with SNES controller ports. For this port, both versions need a Pimoroni Pico Plus 2 mounted on male headers. Parts lists, assembly notes, the pin assignment and the 3D-printed case are described in the [PCB README](https://github.com/PicoPlus-devel/pico_shared/blob/main/PCB/README.md). Both Gerber files are attached to every [release](https://github.com/PicoPlus-devel/pico-outrun/releases/latest) of this project.
 
-| Design | Board it carries | Build | Gerber archive | Designed by |
-| --- | --- | --- | --- | --- |
-| [PicoNES](#picones-pcb) | Pimoroni Pico Plus 2 on male headers — design **v2.6** or later only | `-c2` | `pico_nesPCB_v2.6.zip` | John Edgar Park |
+| Design | Picture | Controller ports | Designed by |
+| ------ | ------- | ---------------- | ----------- |
+| [PicoNES v2.6](#picones-pcb) | <img src="https://raw.githubusercontent.com/PicoPlus-devel/pico_shared/main/PCB/images/picones_v2.6_assembled.jpg" width="240" alt="PicoNES v2.6 with a Pimoroni Pico Plus 2"><br><sub>See note</sub> | 2 × NES | [John Edgar Park](https://twitter.com/johnedgarpark) |
+| [PicoNES v2.8](#picones-pcb) | <img src="https://raw.githubusercontent.com/PicoPlus-devel/pico_shared/main/PCB/images/picones_v2.8s_assembled.jpg" width="240" alt="PicoNES v2.8 with SNES controller ports"><br><sub>See note</sub> | 2 × SNES | [John Edgar Park](https://twitter.com/johnedgarpark) |
 
-The archive lives in [`pico_shared/PCB`](https://github.com/PicoPlus-devel/pico_shared/tree/main/PCB). Upload the zip as-is to a PCB manufacturer of your choice; [PCBWay](https://www.pcbway.com/) and JLCPCB are both good options.
+> [!NOTE]
+> The PicoNES v2.6 and v2.8 are shown with a Pimoroni Pico Plus 2. This port needs the PSRAM of the Pimoroni Pico Plus 2, so no other board can be fitted.
 
-The other two designs from [pico-infonesPlus](https://github.com/PicoPlus-devel/pico-infonesPlus), the **PicoNES Mini** and **PicoNES Micro**, are **not applicable** to this project: they are built around Waveshare boards without PSRAM. Older PicoNES designs (v2.1 and earlier) are not applicable either, for the reason given below.
+The other designs in the PCB README cannot be used with this port. The PicoNES Mini and PicoNES Micro are built around Waveshare boards without PSRAM, and on designs v2.1 and older the microcontroller board must lie flat on the PCB, which the Pimoroni Pico Plus 2 cannot.
 
 > [!NOTE]
 > Sellers on AliExpress have copied the PicoNES design and sell ready-made boards. For questions about those, contact the seller.
 
 ### PicoNES PCB
 
-The design, by [@johnedgarpark](https://twitter.com/johnedgarpark), comes from [pico-infonesPlus](https://github.com/PicoPlus-devel/pico-infonesPlus) and kept its NES-flavoured name, but there is nothing NES-specific about it — it is DVI, microSD and controller wiring, and this port runs on it just as well. The current design is **v2.6**.
-
 > [!IMPORTANT]
-> For this project the PCB only works with a [Pimoroni Pico Plus 2](https://shop.pimoroni.com/products/pimoroni-pico-plus-2?variant=42092668289107), and that board needs design **v2.6 or later** plus male headers. A Raspberry Pi Pico 2 or Pico 2 W has no PSRAM and cannot run pico-outrun at all, so an older PicoNES board built around one of those cannot be reused here — see [Mounting the board](#mounting-the-board).
+> For this project the PCB only works with a [Pimoroni Pico Plus 2](https://shop.pimoroni.com/products/pimoroni-pico-plus-2?variant=42092668289107), mounted on male headers. The Raspberry Pi Pico, Pico 2 and Pico 2 W in the parts list of the PCB README have no PSRAM and cannot run pico-outrun. Optional female socket headers, soldered into the PCB, let the board be plugged in and swapped without desoldering.
 
-<img width="480" alt="Populated PCB with a Pico plugged into the through-holes" src="https://github.com/user-attachments/assets/2bbc846d-56b1-4528-9899-01bc9b32ce11" />
+OutRun is a single-player game. A USB controller, or a controller in either GPIO controller port, can be used; see [Controllers](#controllers). On v2.8, original SNES controllers plug in directly; on v2.6, NES controllers do. The controller ports are optional when a USB controller is used.
 
-#### Mounting the board
+The microSD card is only needed for the SD-card route to the [game data](#game-data); with the data image flashed, the game runs without a card. Audio is carried over HDMI.
 
-Design v2.6 added through-holes, and that is what makes a Pimoroni Pico Plus 2 — and with it the PSRAM this port needs — an option at all:
+Flash `picoOutRun_AdafruitDVISD_pico2_arm.uf2`, the same file as the breadboard build, since the PCB is the same hardware configuration.
 
-| PCB design | Takes a Pimoroni Pico Plus 2? |
-| --- | --- |
-| v2.6 or later (through-holes) | Yes — with male headers soldered on, plugged into the through-holes |
-| v2.1 and older | No — the board has to lie flat against the PCB, which the SP/CE connector on its back prevents |
+The parts lists and assembly notes are in the PCB README: [PicoNES v2.6](https://github.com/PicoPlus-devel/pico_shared/blob/main/PCB/README.md#picones-v26-nes-controller-ports) and [PicoNES v2.8](https://github.com/PicoPlus-devel/pico_shared/blob/main/PCB/README.md#picones-v28-snes-controller-ports).
 
-> [!NOTE]
-> Soldering skills are required. Solder every connection from the board to the PCB, including the ones on the short right-hand side — those are ground.
-
-#### What you need
-
-- A [Pimoroni Pico Plus 2](https://shop.pimoroni.com/products/pimoroni-pico-plus-2?variant=42092668289107) with **male headers** soldered on ([these](https://a.co/d/dSNPuyo) fit), plugged into the through-holes of a v2.6 or later board.
-- [Adafruit DVI Breakout Board — For HDMI Source Devices](https://www.adafruit.com/product/4984)
-- [Adafruit Micro SD SPI or SDIO Card Breakout Board — 3V ONLY!](https://www.adafruit.com/product/4682) — note this is **not** the Micro-SD breakout board+ used in the breadboard build; the PCB is laid out for this smaller one. The card is only needed for the SD-card route to the [game data](#game-data); with the data image flashed, the game runs without a card.
-- [Micro USB to OTG Y-cable](https://a.co/d/b9t11rl) — needed for a USB controller; the Y-cable powers the board and connects the controller at the same time.
-- Micro USB power supply.
-- Optional: an on/off switch, such as [this one](https://www.kiwi-electronics.com/en/spdt-slide-switch-410?search=KW-2467).
-- Optional: [one or two NES controller ports](https://www.zedlabz.com/products/controller-connector-port-for-nintendo-nes-console-7-pin-90-degree-replacement-2-pack-black-zedlabz) — OutRun is a single-player game, so a second port is not required, but a controller in either port can be used. See [Controllers](#controllers).
-
-Audio on this configuration is carried over HDMI.
-
-<img width="480" alt="Assembled PicoNES PCB with controllers connected" src="https://github.com/user-attachments/assets/d40ed98f-4632-4161-986a-732d35290fac" />
-
-#### Which binary to flash
-
-`picoOutRun_AdafruitDVISD_pico2_arm.uf2` — the same file as the breadboard build, since the PCB is the same hardware configuration.
+| NES controller ports (v2.6) | SNES controller ports (v2.8) |
+| --------------------------- | ---------------------------- |
+| <img src="https://raw.githubusercontent.com/PicoPlus-devel/pico_shared/main/PCB/images/picones_v2.6_assembled.jpg" width="400" alt="PicoNES v2.6 with NES controller ports"> | <img src="https://raw.githubusercontent.com/PicoPlus-devel/pico_shared/main/PCB/images/picones_v2.8s_assembled.jpg" width="400" alt="PicoNES v2.8 with SNES controller ports"> |
 
 #### 3D printed case
 
-Gavin Knight ([DynaMight1124](https://github.com/DynaMight1124)) designed an NES-like enclosure for this PCB: [thingiverse.com/thing:6689537](https://www.thingiverse.com/thing:6689537). The v2.0 design has a base, a power-switch part and a choice of two top covers — one with a button that reaches the BOOTSEL button so firmware can be updated without opening the case, one without. Print the files that match the PCB version you own; Gavin's Thingiverse page has the details.
+Gavin Knight ([DynaMight1124](https://github.com/DynaMight1124)) designed an NES-like case for the v2.6 PCB: [thingiverse.com/thing:6689537](https://www.thingiverse.com/thing:6689537). It does not fit the v2.8 PCB. Two top covers are available, one with a button that presses the BOOTSEL button for firmware updates and one without. All parts are shown in the [PCB README](https://github.com/PicoPlus-devel/pico_shared/blob/main/PCB/README.md#3d-printed-case). For questions about the case, please contact the designer on the Thingiverse page.
 
 > [!IMPORTANT]
-> Download the **latest** top cover. The Pimoroni Pico Plus 2 is always mounted on headers here, and headers raise the board — only the newest cover leaves room for the USB cable, the older ones assume a Pico soldered flat onto the PCB.
+> Download the **latest** top cover. The Pimoroni Pico Plus 2 is always mounted on headers here, and headers raise the board. Only the newest cover leaves room for the USB cable; the older ones assume a Pico soldered flat onto the PCB.
 
-<img width="480" alt="Top cover with a button for BOOTSEL" src="https://github.com/user-attachments/assets/3c8f8990-51b9-4873-9054-64bb2cd6c300" />
-
-For the full photo gallery and assembly detail, see the [PCB section of the pico-infonesPlus documentation](https://github.com/PicoPlus-devel/pico-infonesPlus#pcb-with-raspberry-pi-pico-or-pico-2-and-pimoroni-pico-plus-2).
+| Top cover | Base |
+| --------- | ---- |
+| <img src="https://github.com/user-attachments/assets/c6205db3-580e-41e9-83e4-66c9534c6519" width="380" alt="Top cover"> | <img src="https://github.com/user-attachments/assets/256bbd1b-b6db-485d-a59c-fd22fd017887" width="380" alt="Base with the PCB fitted"> |
 
 ***
 
