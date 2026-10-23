@@ -7,8 +7,8 @@ Cannonball engine
 
 ## v0.5.2
 
+- **New setting: Video Clock Fix** (Pimoroni Pico Plus 2 or PicoNES PCB, Murmulator M2 and Olimex RP2040-PICO-PC). Turn it on if your TV or monitor shows small dots or lines in the picture. A USB controller can then no longer be used; use a NES, SNES or Wii controller instead. On the Adafruit Fruit Jam and Feather RP2350 it is always on.
 - **PicoNES PCB Gerber files.** The release now includes the Gerber files of the PicoNES PCB: `pico_nesPCB_v2.6.zip` with NES controller ports, and the new `pico_nesPCB_v2.8_SNES_PORTS.zip` with SNES controller ports, designed by John Edgar Park ([@johnedgarpark](https://twitter.com/johnedgarpark)). Both need a Pimoroni Pico Plus 2 mounted on male headers. See [Custom PCB](https://github.com/PicoPlus-devel/pico-outrun#custom-pcb) in the readme, and the [PCB README](https://github.com/PicoPlus-devel/pico_shared/blob/main/PCB/README.md) for parts lists and build instructions.
-- The binaries are the same as in v0.5.1.
 
 ## v0.5.1
 

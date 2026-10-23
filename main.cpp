@@ -143,6 +143,9 @@ int8_t g_settings_visibility_outrun[MOPT_COUNT] = {
     [MOPT_SERIAL_KEYBOARD] = 0,         // TI-99/4A
     [MOPT_SPRITE_LIMIT] = 0,            // NES
     [MOPT_MENU_OVERSCAN] = 0,           // shown regardless: menu.cpp lists it below the menu colors
+    [MOPT_GENESIS_PAD] = 0,             // Genesis
+    [MOPT_NES_PALETTE] = 0,             // NES
+    [MOPT_HSTX_CLOCK_FIX] = (HSTX && !CFG_TUH_RPI_PIO_USB) ? 2 : 0, // 2: in-game; PIO-USB builds always have it (NES_OVERCLOCK_FIX)
 };
 
 const uint8_t g_available_screen_modes_outrun[] = {
