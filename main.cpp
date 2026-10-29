@@ -480,6 +480,36 @@ static uint32_t readPads(uint16_t wii)
     return b;
 }
 
+#if WII_PIN_SDA >= 0 and WII_PIN_SCL >= 0
+// The Wii-extension pads (Wii Classic, NES/SNES Classic Mini) answer a poll that
+// follows the previous one too closely with garbage that wiipad_read() turns
+// into every button held - SELECT + START included, so the settings menu opens
+// by itself, and again right after it is closed. pico_shared's rule for this
+// is "wiipad_read() once per frame" (pico_shared 1624685).
+//
+// Once per processPerFrame() is not enough here. An engine frame that overruns
+// makes hstx_paceFrame() return at once, and at 30 fps the next frame does no
+// engine work at all, so two polls can land a fraction of a millisecond apart.
+// Hold the last answer instead of polling again within WII_MIN_POLL_US. Same
+// 10 ms as pico-doom's doom_wiipad_read(); the normal 16.7 ms cadence never
+// hits it.
+static constexpr uint64_t WII_MIN_POLL_US = 10000;
+static uint64_t wiiLastPollUs = 0;
+
+static uint16_t readWiiPad(void)
+{
+    static uint16_t last = 0;
+    uint64_t now = Frens::time_us();
+    if (now - wiiLastPollUs < WII_MIN_POLL_US)
+    {
+        return last;
+    }
+    wiiLastPollUs = now;
+    last = wiipad_read();
+    return last;
+}
+#endif
+
 static void processPerFrame(void)
 {
     Frens::PaceFrames60fps(false);
@@ -513,7 +543,7 @@ static void processPerFrame(void)
     tuh_task();
     uint16_t wii = 0;
 #if WII_PIN_SDA >= 0 and WII_PIN_SCL >= 0
-    wii = wiipad_read(); // boards without the Wii port do not link wiipad at all
+    wii = readWiiPad(); // boards without the Wii port do not link wiipad at all
 #endif
 
     static uint32_t prevButtons = 0;
@@ -569,6 +599,10 @@ static void processPerFrame(void)
 
         int rval = showSettingsMenu(true);
         prevButtons = 0;
+#if WII_PIN_SDA >= 0 and WII_PIN_SCL >= 0
+        // The menu polls the pad itself, up to the frame it closed on.
+        wiiLastPollUs = Frens::time_us();
+#endif
 
         /* menu.cpp persists on its own, but only down the SAVE path - B backs
          * out as CANCEL and writes nothing. Write again here: `settings` only
